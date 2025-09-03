@@ -17,15 +17,15 @@ dependencies {
     testImplementation(gradleTestKit())
 }
 
-group = "com.plugin.eveo"
-version = "1.0"
+group = "io.github.e-hai"
+version = "1.0.0"
 
 gradlePlugin {
     website = "https://github.com/e-hai/AppConfigPlugin"
     vcsUrl = "https://github.com/e-hai/AppConfigPlugin"
     // Define the plugin
     val greeting by plugins.creating {
-        id = "com.plugin.config"
+        id = "io.github.e-hai.config"
         displayName = "Plugin for KMP BuildConfig of Gradle plugins"
         description = "A plugin that helps you create BuildConfig class"
         tags = listOf("BuildConfig", "kmp", "local")

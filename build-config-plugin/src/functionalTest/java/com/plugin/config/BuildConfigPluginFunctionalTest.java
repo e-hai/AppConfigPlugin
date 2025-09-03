@@ -39,7 +39,7 @@ public class BuildConfigPluginFunctionalTest {
         // 创建 build.gradle
         writeString(new File(projectDir, "build.gradle"),
                 "plugins {\n" +
-                        "    id('com.plugin.config')\n" +
+                        "    id('io.github.e-hai.config')\n" +
                         "}\n\n" +
                         "buildConfig {\n" +
                         "    packageName('com.demo.example')\n" +
