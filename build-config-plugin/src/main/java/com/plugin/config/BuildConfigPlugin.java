@@ -207,7 +207,7 @@ public class BuildConfigPlugin implements Plugin<Project> {
                 }
 
                 configBuilder.append("    const val ").append(fieldName)
-                        .append(": String = \"").append(value).append("\"\n");
+                        .append(": String = ").append(value).append("\n");
             }
 
             configBuilder.append("}\n");

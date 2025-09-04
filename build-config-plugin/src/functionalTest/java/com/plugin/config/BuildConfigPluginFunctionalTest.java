@@ -28,7 +28,7 @@ public class BuildConfigPluginFunctionalTest {
         Files.createDirectories(projectDir.toPath());
         // 创建 local.properties 文件
         writeString(new File(projectDir, "local.properties"),
-                "HOST=https://api.example.com\n" +
+                "HOST=\"https://api.example.com\"\n" +
                         "API_KEY=test-key-123\n" +
                         "DEBUG_MODE=true");
 

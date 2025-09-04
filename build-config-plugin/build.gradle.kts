@@ -18,7 +18,7 @@ dependencies {
 }
 
 group = "io.github.e-hai"
-version = "1.0.0"
+version = "1.0.1"
 
 gradlePlugin {
     website = "https://github.com/e-hai/AppConfigPlugin"
