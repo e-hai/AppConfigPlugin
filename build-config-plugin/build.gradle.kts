@@ -1,7 +1,7 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
-
+    `kotlin-dsl`
     id("com.gradle.plugin-publish") version "1.2.1"
 }
 
@@ -15,10 +15,11 @@ dependencies {
     testImplementation("junit:junit:4.13")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation(gradleTestKit())
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
 }
 
 group = "io.github.e-hai"
-version = "1.0.1"
+version = "0.0.3"
 
 gradlePlugin {
     website = "https://github.com/e-hai/AppConfigPlugin"

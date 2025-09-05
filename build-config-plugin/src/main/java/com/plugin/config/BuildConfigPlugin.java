@@ -13,6 +13,9 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ListProperty;
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension;
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile;
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +35,26 @@ public class BuildConfigPlugin implements Plugin<Project> {
         project.getTasks().register("generateBuildConfig", GenerateBuildConfigTask.class, task -> {
             setupTask(project, task, extension);
         });
+
+        configureTaskDependencies(project);
+
+        configureSourceSetsAndDependencies(project);
+    }
+
+    private void configureTaskDependencies(Project project) {
+        // Kotlin JVM/Android/Native/JS 编译任务
+        project.getTasks().withType(KotlinCompile.class).configureEach(task -> {
+            task.dependsOn("generateBuildConfig");
+        });
+
+        // Kotlin MPP 的 common 编译任务
+        project.getTasks().withType(KotlinCompileCommon.class).configureEach(task -> {
+            task.dependsOn("generateBuildConfig");
+        });
+
+        // 如果你还要兼容 Java 编译任务
+        project.getTasks().matching(t -> t.getName().equals("compileJava"))
+                .configureEach(t -> t.dependsOn("generateBuildConfig"));
     }
 
     private void setupTask(Project project, GenerateBuildConfigTask task, BuildConfigExtension extension) {
@@ -47,7 +70,7 @@ public class BuildConfigPlugin implements Plugin<Project> {
         task.getOutputFile().set(project.getLayout().getBuildDirectory().file(
                 extension.getPackageName().map(pkg -> extension.getClassName().map(className -> {
                     String packagePath = pkg.replace(".", "/");
-                    return "buildConfig/" + packagePath + "/" + className + ".kt" ;
+                    return "generated/buildConfig/" + packagePath + "/" + className + ".kt";
                 }).get()).get()
         ));
 
@@ -74,7 +97,7 @@ public class BuildConfigPlugin implements Plugin<Project> {
         public BuildConfigExtension() {
             // 设置默认值
             getPackageName().convention("com.example.app");
-            getClassName().convention("BuildConfig");
+            getClassName().convention("AppConfig");
         }
 
         // DSL方法：设置包名
@@ -224,6 +247,25 @@ public class BuildConfigPlugin implements Plugin<Project> {
                     StandardOpenOption.TRUNCATE_EXISTING)) {
                 writer.write(content);
             }
+        }
+    }
+
+    private void configureSourceSetsAndDependencies(Project project) {
+        File generatedSrcDir = new File(project.getBuildDir(), "generated/buildconfig");
+
+        if (project.getPlugins().hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+            configureMultiplatformSourceSet(project, generatedSrcDir);
+        }
+
+        configureTaskDependencies(project);
+    }
+
+    private void configureMultiplatformSourceSet(Project project, File generatedSrcDir) {
+        KotlinMultiplatformExtension kmp = project.getExtensions().findByType(KotlinMultiplatformExtension.class);
+        if (kmp != null) {
+            // 获取 commonMain 源集
+            kmp.getSourceSets().getByName("commonMain").getKotlin().srcDir(generatedSrcDir);
+            project.getLogger().lifecycle("Added generated source directory to commonMain: " + generatedSrcDir);
         }
     }
 }

@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import org.gradle.testkit.runner.TaskOutcome;
 
 import java.io.*;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +44,7 @@ public class BuildConfigPluginFunctionalTest {
                         "}\n\n" +
                         "buildConfig {\n" +
                         "    packageName('com.demo.example')\n" +
-                        "    className('BuildConfig')\n" +
+                        "    className('AppConfig')\n" +
                         "    propertiesFile('local.properties')\n" +
                         "    field('HOST')\n" +
                         "    field('API_KEY')\n" +
@@ -57,17 +58,17 @@ public class BuildConfigPluginFunctionalTest {
                 .build();
 
         // 验证任务执行成功
-        assertEquals(TaskOutcome.SUCCESS, result.task(":generateBuildConfig").getOutcome());
+        assertEquals(TaskOutcome.SUCCESS, Objects.requireNonNull(result.task(":generateBuildConfig")).getOutcome());
 
         // 验证生成的文件存在
-        File generatedFile = new File(projectDir, "build/buildconfig/com/demo/example/BuildConfig.kt");
+        File generatedFile = new File(projectDir, "build/generated/buildConfig/com/demo/example/AppConfig.kt");
         assertTrue(String.valueOf(generatedFile.exists()), true);
 
         // 验证文件内容
         String content = readFileContent(generatedFile);
         assertAll("Generated file content validation",
                 () -> assertTrue(String.valueOf(content.contains("package com.demo.example")), true),
-                () -> assertTrue(String.valueOf(content.contains("object BuildConfig")), true)
+                () -> assertTrue(String.valueOf(content.contains("object AppConfig")), true)
         );
     }
 
